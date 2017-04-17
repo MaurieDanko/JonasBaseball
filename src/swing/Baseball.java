@@ -58,23 +58,24 @@ public class Baseball {
     JPanel teamRight = new JPanel();
     JPanel teamLeft = new JPanel();
     public int guess = -1;
+    private static String IMG = "images/";
 
     public Baseball() {
         //Get base photos
-        base1.setIcon(new ImageIcon(getImage("base1.png")));
-        base2.setIcon(new ImageIcon(getImage("base2.png")));
-        base3.setIcon(new ImageIcon(getImage("base3.png")));
-        base12.setIcon(new ImageIcon(getImage("base12.png")));
-        base123.setIcon(new ImageIcon(getImage("base123.png")));
-        base13.setIcon(new ImageIcon(getImage("base13.png")));
-        base23.setIcon(new ImageIcon(getImage("base23.png")));
+        base1.setIcon(new ImageIcon(getImage(IMG+"base1.png")));
+        base2.setIcon(new ImageIcon(getImage(IMG+"base2.png")));
+        base3.setIcon(new ImageIcon(getImage(IMG+"base3.png")));
+        base12.setIcon(new ImageIcon(getImage(IMG+"base12.png")));
+        base123.setIcon(new ImageIcon(getImage(IMG+"base123.png")));
+        base13.setIcon(new ImageIcon(getImage(IMG+"base13.png")));
+        base23.setIcon(new ImageIcon(getImage(IMG+"base23.png")));
 
         frame.setTitle("Baseball");
         frame.setSize(toolkit.getScreenSize());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
         frame.setResizable(false);
-        image.setIcon(new ImageIcon(getImage("base0.png")));
+        image.setIcon(new ImageIcon(getImage(IMG+"base0.png")));
         frame.setLayout(new BorderLayout());
         frame.add(image);
 
