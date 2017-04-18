@@ -35,7 +35,7 @@ public class BaseballGame {
 
     Random random = new Random();
     JFrame frame = new JFrame();
-    Container field;
+    Container field= frame.getContentPane();
     
     int outs = 0;
     int[] runs = new int[2];
@@ -70,9 +70,6 @@ public class BaseballGame {
         } catch (IOException x) {
             throw new RuntimeException(x);
         }
-
-        field = frame.getContentPane();
-        field.setLayout(new BorderLayout());
         field.add(nobase);
 
         JPanel teamRight = new JPanel();
@@ -91,7 +88,6 @@ public class BaseballGame {
         field.add(teamLeft, BorderLayout.SOUTH);
 
         frame.setTitle("BaseballGame");
-//        frame.setSize(Toolkit.getDefaultToolkit().getScreenSize());
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
@@ -259,10 +255,14 @@ public class BaseballGame {
             score.setFont(new Font("Serif", Font.PLAIN, 25));
             dialogPanel.add(score);
             scoreBoard.add(dialogPanel);
+            score.setText(TEAMS[0] + " " + runs[0] + " - " + TEAMS[1] + " " + runs[1]);
             scoreBoard.pack();
             scoreBoard.setVisible(true);
+            scoreBoard.setAlwaysOnTop(true);
+
+        } else {
+            score.setText(TEAMS[0] + " " + runs[0] + " - " + TEAMS[1] + " " + runs[1]);
         }
-        score.setText(TEAMS[0] + " " + runs[0] + "-" + TEAMS[1] + " " + runs[1]);
     }
 
     JDialog hitAction;
@@ -278,8 +278,9 @@ public class BaseballGame {
             hitAction.pack();
             hitAction.setVisible(true);
             hitAction.setAlwaysOnTop(true);
+        } else {
+            hitLabel.setText(phrase);
         }
-        hitLabel.setText(phrase);
     }
 
     JDialog pitchDialog;
