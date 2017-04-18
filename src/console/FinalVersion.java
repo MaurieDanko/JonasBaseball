@@ -8,6 +8,9 @@ public class FinalVersion {
 		// SCANNER VARIABLE
 		Scanner input = new Scanner(System.in); // This is the Scanner variable
 
+
+		//
+
 		// GAME Run Variable
 		boolean loop = true;
 
