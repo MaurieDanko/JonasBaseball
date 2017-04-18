@@ -91,19 +91,24 @@ public class BallGame {
 
             String batter = (PLAYERS[random.nextInt(PLAYERS.length)]);
 
-            String outcome;
+            AtBatOutcome outcome;
             float rnd = random.nextFloat();
             if (rnd < .300) { // hit
-                if (rnd < .05)
-                    outcome = "Homerun";
-                else if (rnd < .100)
-                    outcome = "Triple";
-                else if (rnd < .200)
-                    outcome = "Double";
+                if (rnd < .007)
+                    outcome = AtBatOutcome.HOMERUN;
+                else if (rnd < .03)
+                    outcome = AtBatOutcome.TRIPLE;
+                else if (rnd < .07)
+                    outcome = AtBatOutcome.DOUBLE;
                 else
-                    outcome = "Single";
+                    outcome = AtBatOutcome.SINGLE;
             } else { // .700 not hit
-                outcome = "out";
+                if (rnd < .400)
+                    outcome = AtBatOutcome.WALK;
+                else if (rnd < .500)
+                    outcome = AtBatOutcome.STRIKEOUT;
+                else
+                    outcome = AtBatOutcome.OUT;
             }
 
             System.out.println("-----------------SCORE BOARD-----------------  ");
@@ -117,7 +122,19 @@ public class BallGame {
             System.out.println("| " + teamName[1] + " Batter: " + batter + " => " + outcome);
 
             switch (outcome) {
-                case "Single":
+                case WALK:
+                    if (base1 != null) {
+                        if (base2 != null) {
+                            if (base3 != null)
+                                ++score[team];
+                            base3 = base2;
+                        }
+                        base2 = base1;
+                    }
+                    base1 = batter;
+                    break;
+
+                case SINGLE:
                     if (base3 != null)
                         ++score[team];
                     base3 = base2;
@@ -125,7 +142,7 @@ public class BallGame {
                     base1 = batter;
                     break;
 
-                case "Double":
+                case DOUBLE:
                     if (base3 != null)
                         ++score[team];
                     if (base2 != null)
@@ -135,7 +152,7 @@ public class BallGame {
                     base1 = null;
                     break;
 
-                case "Triple":
+                case TRIPLE:
                     if (base3 != null)
                         ++score[team];
                     if (base2 != null)
@@ -146,7 +163,7 @@ public class BallGame {
                     base2 = base1 = null;
                     break;
 
-                case "Homerun":
+                case HOMERUN:
                     if (base3 != null)
                         ++score[team];
                     if (base2 != null)
@@ -157,11 +174,19 @@ public class BallGame {
                     base3 = base2 = base1 = null;
                     break;
 
-                default:
+                case OUT:
+                case STRIKEOUT:
                     outs++;
                     break;
+
+                default:
+                    throw new RuntimeException("unknown hitting outcome");
             }
         }
+    }
+
+    enum AtBatOutcome {
+        OUT, SINGLE, DOUBLE, TRIPLE, HOMERUN, WALK, STRIKEOUT;
     }
 
     static int HOME = 1, AWAY = 0;
