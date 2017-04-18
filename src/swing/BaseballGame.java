@@ -1,9 +1,6 @@
 package swing;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -19,14 +16,13 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 
 //Pitches: Curveball = 0, slider = 1, fastball = 2, changeup = 3, splitfinger = 4
-public class Baseball {
+public class BaseballGame {
     private static String IMG = "images/";
+    static String[] TEAMS = { "Blue Jays", "Yankees" };
 
     private enum Pitches {
         CURVE, SLIDER, FASTBALL, CHANGE_UP, SPLIT_FINGER;
     }
-
-    ;
 
     public static void main(String[] args) {
         try {
@@ -34,12 +30,13 @@ public class Baseball {
         } catch (Exception exc) {
             System.exit(-1);
         }
-        Baseball b = new Baseball();
+        BaseballGame b = new BaseballGame();
     }
 
     Random random = new Random();
     JFrame frame = new JFrame();
-
+    Container field;
+    
     int outs = 0;
     int[] runs = new int[2];
     int sideBatting = 0;
@@ -58,12 +55,9 @@ public class Baseball {
     JLabel base123 = new JLabel();
     JLabel base13 = new JLabel();
     JLabel base23 = new JLabel();
-
     JLabel nobase = new JLabel();
-    JPanel teamRight = new JPanel();
-    JPanel teamLeft = new JPanel();
 
-    public Baseball() {
+    public BaseballGame() {
         try {
             nobase.setIcon(new ImageIcon(ImageIO.read(getClass().getResource(IMG + "base0.png"))));
             base1.setIcon(new ImageIcon(ImageIO.read(getClass().getResource(IMG + "base1.png"))));
@@ -76,28 +70,34 @@ public class Baseball {
         } catch (IOException x) {
             throw new RuntimeException(x);
         }
-        frame.setTitle("Baseball");
-        frame.setSize(Toolkit.getDefaultToolkit().getScreenSize());
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-        frame.setResizable(false);
-        frame.setLayout(new BorderLayout());
-        frame.add(nobase);
 
+        field = frame.getContentPane();
+        field.setLayout(new BorderLayout());
+        field.add(nobase);
+
+        JPanel teamRight = new JPanel();
         teamRight.setLayout(new FlowLayout(FlowLayout.RIGHT));
         JLabel rightLabel = new JLabel("Team 2");
         rightLabel.setFont(new Font("Serif", Font.PLAIN, 25));
         teamRight.add(rightLabel);
+
+        JPanel teamLeft = new JPanel();
         teamLeft.setLayout(new FlowLayout(FlowLayout.LEFT));
         JLabel leftLabel = new JLabel("Team 1");
         leftLabel.setFont(new Font("Serif", Font.PLAIN, 25));
         teamLeft.add(leftLabel);
         teamLeft.add(new JLabel("                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         "));
         teamLeft.add(teamRight);
-        //frame.add(teamRight, BorderLayout.SOUTH);
-        frame.add(teamLeft, BorderLayout.SOUTH);
-        repaint();
-        showPlayDialog();
+        field.add(teamLeft, BorderLayout.SOUTH);
+
+        frame.setTitle("BaseballGame");
+//        frame.setSize(Toolkit.getDefaultToolkit().getScreenSize());
+        frame.pack();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+        frame.setResizable(false);
+
+        showPitchesDialog();
     }
 
     private void pitch(int expectedPitch) {
@@ -107,7 +107,7 @@ public class Baseball {
         if (pitch == expectedPitch) {
             switch (hitAction) {
                 case 0:
-                    showDialog("HOMERUN!");
+                    showBatterResult("HOMERUN!");
                     if (third) {
                         ++runs[sideBatting];
                         third = false;
@@ -121,11 +121,10 @@ public class Baseball {
                         first = false;
                     }
                     ++runs[sideBatting];
-                    removeAll();
-                    setImage();
+                    showField();
                     break;
                 case 1:
-                    showDialog("Single");
+                    showBatterResult("Single");
                     if (third) {
                         ++runs[sideBatting];
                         third = false;
@@ -138,11 +137,10 @@ public class Baseball {
                         second = true;
                     }
                     first = true;
-                    removeAll();
-                    setImage();
+                    showField();
                     break;
                 case 2:
-                    showDialog("Double");
+                    showBatterResult("Double");
                     if (third) {
                         ++runs[sideBatting];
                         third = false;
@@ -156,11 +154,10 @@ public class Baseball {
                         third = true;
                     }
                     second = true;
-                    removeAll();
-                    setImage();
+                    showField();
                     break;
                 case 3:
-                    showDialog("Triple");
+                    showBatterResult("Triple");
                     if (third) {
                         ++runs[sideBatting];
                         third = false;
@@ -174,11 +171,10 @@ public class Baseball {
                         first = false;
                     }
                     third = true;
-                    removeAll();
-                    setImage();
+                    showField();
                     break;
                 default:
-                    showDialog("Out!");
+                    showBatterResult("Out!");
                     outs++;
                     break;
             }
@@ -186,8 +182,7 @@ public class Baseball {
             switch (hitAction) {
                 case 3:
                 case 4:
-                    showDialog("Single");
-                    removeAll();
+                    showBatterResult("Single");
                     if (third) {
                         ++runs[sideBatting];
                         third = false;
@@ -200,52 +195,47 @@ public class Baseball {
                         second = true;
                     }
                     first = true;
-                    setImage();
+                    showField();
                     break;
                 default:
-                    showDialog("Out!");
+                    showBatterResult("Out!");
                     outs++;
                     break;
             }
         }
+        showScore();
         if (outs == 3) {
             if (sideBatting == 1) {
                 inning++;
             }
             if (inning < 9) {
                 sideBatting = 1 - sideBatting;
-                showDialog("Player " + sideBatting);
+                showBatterResult("Player " + sideBatting);
                 outs = 0;
                 first = second = third = false;
             }
-            removeAll();
-            setImage();
-        }
-        if (!(inning == 9)) {
-            showPlayDialog();
-        } else {
-            removeAll();
-            repaint();
+            showField();
         }
     }
 
-    private void setImage() {
+    private void showField() {
+        field.removeAll();
         if (first && second && third) {
-            frame.add(base123);
+            field.add(base123);
         } else if (first && second && !third) {
-            frame.add(base12);
+            field.add(base12);
         } else if (first && third && !second) {
-            frame.add(base13);
+            field.add(base13);
         } else if (second && third && !first) {
-            frame.add(base23);
+            field.add(base23);
         } else if (third && !second && !first) {
-            frame.add(base3);
+            field.add(base3);
         } else if (second && !third && !first) {
-            frame.add(base2);
+            field.add(base2);
         } else if (first && !second && !third) {
-            frame.add(base1);
+            field.add(base1);
         } else if (!first && !second && !third) {
-            frame.add(nobase);
+            field.add(nobase);
         }
         repaint();
     }
@@ -255,140 +245,125 @@ public class Baseball {
         frame.validate();
     }
 
-    private void removeAll() {
-        frame.remove(base1);
-        frame.remove(base12);
-        frame.remove(base123);
-        frame.remove(base13);
-        frame.remove(base2);
-        frame.remove(base23);
-        frame.remove(base3);
-        frame.remove(nobase);
-    }
+    JDialog scoreBoard;
+    JLabel score;
 
     private void showScore() {
-        JDialog dialog = new JDialog();
-        dialog.setLayout(new FlowLayout());
-        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        JPanel dialogPanel = new JPanel();
-        dialogPanel.setLayout(new BoxLayout(dialogPanel, BoxLayout.Y_AXIS));
-        JLabel score = new JLabel();
-        score.setFont(new Font("Serif", Font.PLAIN, 25));
-        score.setText(runs[0] + "-" + runs[1]);
-        dialogPanel.add(score);
-        dialog.add(dialogPanel);
-        dialog.pack();
-        dialog.setVisible(true);
+        if (scoreBoard == null) {
+            scoreBoard = new JDialog();
+            scoreBoard.setLayout(new FlowLayout());
+            scoreBoard.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+            JPanel dialogPanel = new JPanel();
+            dialogPanel.setLayout(new BoxLayout(dialogPanel, BoxLayout.Y_AXIS));
+            score = new JLabel();
+            score.setFont(new Font("Serif", Font.PLAIN, 25));
+            dialogPanel.add(score);
+            scoreBoard.add(dialogPanel);
+            scoreBoard.pack();
+            scoreBoard.setVisible(true);
+        }
+        score.setText(TEAMS[0] + " " + runs[0] + "-" + TEAMS[1] + " " + runs[1]);
     }
 
-    private void showDialog(String phrase) {
-        JDialog homerun = new JDialog();
-        homerun.setLayout(new FlowLayout());
-        JLabel label = new JLabel(phrase);
-        label.setFont(new Font("Serif", Font.PLAIN, 250));
-        homerun.add(label);
-        homerun.pack();
-        homerun.setVisible(true);
-        homerun.setAlwaysOnTop(true);
+    JDialog hitAction;
+    JLabel hitLabel;
+
+    private void showBatterResult(String phrase) {
+        if (hitAction == null) {
+            hitAction = new JDialog();
+            hitAction.setLayout(new FlowLayout());
+            hitLabel = new JLabel(phrase);
+            hitLabel.setFont(new Font("Serif", Font.PLAIN, 250));
+            hitAction.add(hitLabel);
+            hitAction.pack();
+            hitAction.setVisible(true);
+            hitAction.setAlwaysOnTop(true);
+        }
+        hitLabel.setText(phrase);
     }
 
-    private void showPlayDialog() {
-        final JDialog dialog = new JDialog();
-        dialog.setLayout(new FlowLayout());
-        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-        JPanel dialogPanel = new JPanel();
-        dialogPanel.setLayout(new BoxLayout(dialogPanel, BoxLayout.Y_AXIS));
-        JPanel layoutPanel = new JPanel();
-        layoutPanel.setLayout(new FlowLayout());
-        JButton curveball = new JButton("Curveball");
-        JPanel curveballPanel = new JPanel();
-        curveballPanel.setLayout(new FlowLayout());
-        curveballPanel.add(curveball);
-        curveball.addActionListener(new ActionListener() {
+    JDialog pitchDialog;
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dialog.dispose();
-                pitch(0);
-            }
+    private void showPitchesDialog() {
+        if (pitchDialog == null) {
+            pitchDialog = new JDialog();
 
-        });
+            pitchDialog.setLayout(new FlowLayout());
+            pitchDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+            JPanel dialogPanel = new JPanel();
+            dialogPanel.setLayout(new BoxLayout(dialogPanel, BoxLayout.Y_AXIS));
+            JPanel layoutPanel = new JPanel();
+            layoutPanel.setLayout(new FlowLayout());
+            JButton curveball = new JButton("Curveball");
+            JPanel curveballPanel = new JPanel();
+            curveballPanel.setLayout(new FlowLayout());
+            curveballPanel.add(curveball);
+            curveball.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    pitch(0);
+                }
+            });
 
-        JButton slider = new JButton("Slider");
-        JPanel sliderPanel = new JPanel();
-        sliderPanel.setLayout(new FlowLayout());
-        sliderPanel.add(slider);
-        slider.addActionListener(new ActionListener() {
+            JButton slider = new JButton("Slider");
+            JPanel sliderPanel = new JPanel();
+            sliderPanel.setLayout(new FlowLayout());
+            sliderPanel.add(slider);
+            slider.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    pitch(1);
+                }
+            });
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dialog.dispose();
-                pitch(1);
-            }
+            JButton fastball = new JButton("Fastball");
+            JPanel fastballPanel = new JPanel();
+            fastballPanel.setLayout(new FlowLayout());
+            fastballPanel.add(fastball);
+            fastball.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    pitch(2);
+                }
+            });
 
-        });
+            JButton changeup = new JButton("Changeup");
+            JPanel changeupPanel = new JPanel();
+            changeupPanel.setLayout(new FlowLayout());
+            changeupPanel.add(changeup);
+            changeup.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    pitch(3);
+                }
+            });
 
-        JButton fastball = new JButton("Fastball");
-        JPanel fastballPanel = new JPanel();
-        fastballPanel.setLayout(new FlowLayout());
-        fastballPanel.add(fastball);
-        fastball.addActionListener(new ActionListener() {
+            JButton splitfinger = new JButton("Splitfinger");
+            JPanel splitfingerPanel = new JPanel();
+            splitfingerPanel.setLayout(new FlowLayout());
+            splitfingerPanel.add(splitfinger);
+            splitfinger.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    pitch(4);
+                }
+            });
+            JLabel layoutLabel = new JLabel("What pitch do you think is going to be thrown?");
+            layoutLabel.setFont(new Font("Serif", Font.PLAIN, 20));
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dialog.dispose();
-                pitch(2);
-            }
+            dialogPanel.add(layoutLabel);
+            dialogPanel.add(curveballPanel);
+            dialogPanel.add(sliderPanel);
+            dialogPanel.add(fastballPanel);
+            dialogPanel.add(changeupPanel);
+            dialogPanel.add(splitfingerPanel);
 
-        });
+            layoutPanel.add(dialogPanel);
 
-        JButton changeup = new JButton("Changeup");
-        JPanel changeupPanel = new JPanel();
-        changeupPanel.setLayout(new FlowLayout());
-        changeupPanel.add(changeup);
-        changeup.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dialog.dispose();
-                pitch(3);
-            }
-
-        });
-
-        JButton splitfinger = new JButton("Splitfinger");
-        JPanel splitfingerPanel = new JPanel();
-        splitfingerPanel.setLayout(new FlowLayout());
-        splitfingerPanel.add(splitfinger);
-        splitfinger.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dialog.dispose();
-                pitch(4);
-            }
-
-        });
-        JLabel layoutLabel = new JLabel("What pitch do you think is going to be thrown?");
-        layoutLabel.setFont(new Font("Serif", Font.PLAIN, 20));
-        JLabel score = new JLabel();
-        score.setFont(new Font("Serif", Font.PLAIN, 20));
-        score.setText(runs[0] + "-" + runs[1]);
-        JPanel scorePanel = new JPanel();
-        scorePanel.setLayout(new FlowLayout());
-        scorePanel.add(score);
-        dialogPanel.add(layoutLabel);
-        dialogPanel.add(scorePanel);
-        dialogPanel.add(curveballPanel);
-        dialogPanel.add(sliderPanel);
-        dialogPanel.add(fastballPanel);
-        dialogPanel.add(changeupPanel);
-        dialogPanel.add(splitfingerPanel);
-
-        layoutPanel.add(dialogPanel);
-
-        dialog.add(layoutPanel);
-        dialog.setSize(500, 500);
-        dialog.setVisible(true);
+            pitchDialog.add(layoutPanel);
+//            pitchDialog.setSize(500, 500);
+            pitchDialog.pack();
+            pitchDialog.setVisible(true);
+        }
     }
 }
