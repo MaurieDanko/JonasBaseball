@@ -3,10 +3,10 @@ package swing;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
@@ -20,6 +20,13 @@ import javax.swing.UIManager;
 
 //Pitches: Curveball = 0, slider = 1, fastball = 2, changeup = 3, splitfinger = 4
 public class Baseball {
+    private static String IMG = "images/";
+
+    private enum Pitches {
+        CURVE, SLIDER, FASTBALL, CHANGE_UP, SPLIT_FINGER;
+    }
+
+    ;
 
     public static void main(String[] args) {
         try {
@@ -30,14 +37,12 @@ public class Baseball {
         Baseball b = new Baseball();
     }
 
+    Random random = new Random();
     JFrame frame = new JFrame();
-    Toolkit toolkit = Toolkit.getDefaultToolkit();
-    Image img;
 
     int outs = 0;
-    int playerOne;
-    int playerTwo;
-    int player = 1;
+    int[] runs = new int[2];
+    int sideBatting = 0;
     int inning = 1;
 
     //Boolean for bases
@@ -54,30 +59,30 @@ public class Baseball {
     JLabel base13 = new JLabel();
     JLabel base23 = new JLabel();
 
-    JLabel image = new JLabel();
+    JLabel nobase = new JLabel();
     JPanel teamRight = new JPanel();
     JPanel teamLeft = new JPanel();
-    public int guess = -1;
-    private static String IMG = "images/";
 
     public Baseball() {
-        //Get base photos
-        base1.setIcon(new ImageIcon(getImage(IMG+"base1.png")));
-        base2.setIcon(new ImageIcon(getImage(IMG+"base2.png")));
-        base3.setIcon(new ImageIcon(getImage(IMG+"base3.png")));
-        base12.setIcon(new ImageIcon(getImage(IMG+"base12.png")));
-        base123.setIcon(new ImageIcon(getImage(IMG+"base123.png")));
-        base13.setIcon(new ImageIcon(getImage(IMG+"base13.png")));
-        base23.setIcon(new ImageIcon(getImage(IMG+"base23.png")));
-
+        try {
+            nobase.setIcon(new ImageIcon(ImageIO.read(getClass().getResource(IMG + "base0.png"))));
+            base1.setIcon(new ImageIcon(ImageIO.read(getClass().getResource(IMG + "base1.png"))));
+            base2.setIcon(new ImageIcon(ImageIO.read(getClass().getResource(IMG + "base2.png"))));
+            base3.setIcon(new ImageIcon(ImageIO.read(getClass().getResource(IMG + "base3.png"))));
+            base12.setIcon(new ImageIcon(ImageIO.read(getClass().getResource(IMG + "base12.png"))));
+            base123.setIcon(new ImageIcon(ImageIO.read(getClass().getResource(IMG + "base123.png"))));
+            base13.setIcon(new ImageIcon(ImageIO.read(getClass().getResource(IMG + "base13.png"))));
+            base23.setIcon(new ImageIcon(ImageIO.read(getClass().getResource(IMG + "base23.png"))));
+        } catch (IOException x) {
+            throw new RuntimeException(x);
+        }
         frame.setTitle("Baseball");
-        frame.setSize(toolkit.getScreenSize());
+        frame.setSize(Toolkit.getDefaultToolkit().getScreenSize());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
         frame.setResizable(false);
-        image.setIcon(new ImageIcon(getImage(IMG+"base0.png")));
         frame.setLayout(new BorderLayout());
-        frame.add(image);
+        frame.add(nobase);
 
         teamRight.setLayout(new FlowLayout(FlowLayout.RIGHT));
         JLabel rightLabel = new JLabel("Team 2");
@@ -95,48 +100,34 @@ public class Baseball {
         showPlayDialog();
     }
 
-    private int getPitch() {
-        Random random = new Random();
-        return random.nextInt(5);
-    }
-
-    private void pitch() {
-        int answer = getPitch();
-        System.out.println(answer);
-        if (answer == guess) {
-            Random random = new Random();
-            int randomNum = random.nextInt(6);
-            switch (randomNum) {
+    private void pitch(int expectedPitch) {
+        int pitch = random.nextInt(Pitches.values().length);
+        System.out.println(pitch);
+        int hitAction = random.nextInt(6);
+        if (pitch == expectedPitch) {
+            switch (hitAction) {
                 case 0:
                     showDialog("HOMERUN!");
-                    removeAll();
-                    if (player == 1) {
-                        playerOne += third ? 1 : 0;
-                        playerOne += second ? 1 : 0;
-                        playerOne += first ? 1 : 0;
-                        playerOne++;
-                    } else {
-                        playerTwo += third ? 1 : 0;
-                        playerTwo += second ? 1 : 0;
-                        playerTwo += first ? 1 : 0;
-                        playerTwo++;
+                    if (third) {
+                        ++runs[sideBatting];
+                        third = false;
                     }
-
-                    first = false;
-                    second = false;
-                    third = false;
+                    if (second) {
+                        ++runs[sideBatting];
+                        second = false;
+                    }
+                    if (first) {
+                        ++runs[sideBatting];
+                        first = false;
+                    }
+                    ++runs[sideBatting];
+                    removeAll();
                     setImage();
-                    repaint();
                     break;
                 case 1:
                     showDialog("Single");
-                    removeAll();
                     if (third) {
-                        if (player == 1) {
-                            playerOne += 1;
-                        } else {
-                            playerTwo += 1;
-                        }
+                        ++runs[sideBatting];
                         third = false;
                     }
                     if (second) {
@@ -147,126 +138,58 @@ public class Baseball {
                         second = true;
                     }
                     first = true;
+                    removeAll();
                     setImage();
-                    repaint();
                     break;
                 case 2:
                     showDialog("Double");
-                    removeAll();
-                    if (second) {
-                        if (player == 1) {
-                            playerOne++;
-                        } else {
-                            playerTwo++;
-                        }
-                    }
-
                     if (third) {
-                        if (player == 1) {
-                            playerOne++;
-                        } else {
-                            playerTwo++;
-                        }
+                        ++runs[sideBatting];
                         third = false;
                     }
-
+                    if (second) {
+                        ++runs[sideBatting];
+                        second = false;
+                    }
                     if (first) {
                         first = false;
                         third = true;
                     }
                     second = true;
+                    removeAll();
                     setImage();
-                    repaint();
                     break;
                 case 3:
                     showDialog("Triple");
-                    removeAll();
-                    if (first) {
-                        if (player == 1) {
-                            playerOne++;
-                        } else {
-                            playerTwo++;
-                        }
-                        first = false;
-                    }
-
-                    if (second) {
-                        if (player == 1) {
-                            playerOne++;
-                        } else {
-                            playerTwo++;
-                        }
-                        second = false;
-                    }
-
                     if (third) {
-                        if (player == 1) {
-                            playerOne++;
-                        } else {
-                            playerTwo++;
-                        }
+                        ++runs[sideBatting];
                         third = false;
                     }
+                    if (second) {
+                        ++runs[sideBatting];
+                        second = false;
+                    }
+                    if (first) {
+                        ++runs[sideBatting];
+                        first = false;
+                    }
                     third = true;
+                    removeAll();
                     setImage();
-                    repaint();
                     break;
-                case 4:
-                    showDialog("Out!");
-                    outs++;
-                    break;
-                case 5:
+                default:
                     showDialog("Out!");
                     outs++;
                     break;
             }
         } else {
-            Random random = new Random();
-            int randomNum = random.nextInt(6);
-            switch (randomNum) {
-                case 0:
-                    showDialog("Out!");
-                    outs++;
-                    break;
-                case 1:
-                    showDialog("Out!");
-                    outs++;
-                    break;
-                case 2:
-                    showDialog("Out!");
-                    outs++;
-                    break;
+            switch (hitAction) {
                 case 3:
-                    showDialog("Single");
-                    removeAll();
-                    if (third) {
-                        if (player == 1) {
-                            playerOne += 1;
-                        } else {
-                            playerTwo += 1;
-                        }
-                        third = false;
-                    }
-                    if (second) {
-                        second = false;
-                        third = true;
-                    }
-                    if (first) {
-                        second = true;
-                    }
-                    first = true;
-                    setImage();
-                    repaint();
-                    break;
                 case 4:
                     showDialog("Single");
                     removeAll();
                     if (third) {
-                        if (player == 1) {
-                            playerOne += 1;
-                        } else {
-                            playerTwo += 1;
-                        }
+                        ++runs[sideBatting];
                         third = false;
                     }
                     if (second) {
@@ -278,37 +201,32 @@ public class Baseball {
                     }
                     first = true;
                     setImage();
-                    repaint();
                     break;
-                case 5:
+                default:
                     showDialog("Out!");
                     outs++;
                     break;
             }
         }
         if (outs == 3) {
-            if (player == 2) {
+            if (sideBatting == 1) {
                 inning++;
             }
-
-            if (inning != 9) {
-                player = player == 1 ? 2 : 1;
-                showDialog("Player " + player);
+            if (inning < 9) {
+                sideBatting = 1 - sideBatting;
+                showDialog("Player " + sideBatting);
                 outs = 0;
                 first = second = third = false;
             }
-
             removeAll();
             setImage();
-            repaint();
         }
         if (!(inning == 9)) {
             showPlayDialog();
         } else {
             removeAll();
-            //frame.add
+            repaint();
         }
-        return;
     }
 
     private void setImage() {
@@ -327,8 +245,9 @@ public class Baseball {
         } else if (first && !second && !third) {
             frame.add(base1);
         } else if (!first && !second && !third) {
-            frame.add(image);
+            frame.add(nobase);
         }
+        repaint();
     }
 
     private void repaint() {
@@ -344,33 +263,22 @@ public class Baseball {
         frame.remove(base2);
         frame.remove(base23);
         frame.remove(base3);
-        frame.remove(image);
+        frame.remove(nobase);
     }
 
-    JDialog dialog;
-
     private void showScore() {
-        dialog = new JDialog();
+        JDialog dialog = new JDialog();
         dialog.setLayout(new FlowLayout());
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         JPanel dialogPanel = new JPanel();
         dialogPanel.setLayout(new BoxLayout(dialogPanel, BoxLayout.Y_AXIS));
         JLabel score = new JLabel();
         score.setFont(new Font("Serif", Font.PLAIN, 25));
-        score.setText(playerOne + "-" + playerTwo);
+        score.setText(runs[0] + "-" + runs[1]);
         dialogPanel.add(score);
         dialog.add(dialogPanel);
         dialog.pack();
         dialog.setVisible(true);
-    }
-
-    private Image getImage(String name) {
-        try {
-            return ImageIO.read(getClass().getResource(name))
-                    .getScaledInstance(toolkit.getScreenSize().width, toolkit.getScreenSize().height, Image.SCALE_SMOOTH);
-        } catch (Exception e2) {
-            throw new RuntimeException(e2);
-        }
     }
 
     private void showDialog(String phrase) {
@@ -400,10 +308,8 @@ public class Baseball {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                guess = 0;
                 dialog.dispose();
-                repaint();
-                pitch();
+                pitch(0);
             }
 
         });
@@ -416,10 +322,8 @@ public class Baseball {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                guess = 1;
                 dialog.dispose();
-                repaint();
-                pitch();
+                pitch(1);
             }
 
         });
@@ -432,10 +336,8 @@ public class Baseball {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                guess = 2;
                 dialog.dispose();
-                repaint();
-                pitch();
+                pitch(2);
             }
 
         });
@@ -448,10 +350,8 @@ public class Baseball {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                guess = 3;
                 dialog.dispose();
-                repaint();
-                pitch();
+                pitch(3);
             }
 
         });
@@ -464,10 +364,8 @@ public class Baseball {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                guess = 4;
                 dialog.dispose();
-                repaint();
-                pitch();
+                pitch(4);
             }
 
         });
@@ -475,7 +373,7 @@ public class Baseball {
         layoutLabel.setFont(new Font("Serif", Font.PLAIN, 20));
         JLabel score = new JLabel();
         score.setFont(new Font("Serif", Font.PLAIN, 20));
-        score.setText(playerOne + "-" + playerTwo);
+        score.setText(runs[0] + "-" + runs[1]);
         JPanel scorePanel = new JPanel();
         scorePanel.setLayout(new FlowLayout());
         scorePanel.add(score);
