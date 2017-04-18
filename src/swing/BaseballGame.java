@@ -210,7 +210,7 @@ public class BaseballGame {
             }
             if (inning < 9) {
                 sideBatting = 1 - sideBatting;
-                showBatterResult("Player " + sideBatting);
+                showBatterResult(TEAMS[sideBatting]); // TODO wrong dialog
                 outs = 0;
                 first = second = third = false;
             }
