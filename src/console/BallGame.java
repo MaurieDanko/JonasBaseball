@@ -31,7 +31,8 @@ public class BallGame {
             System.out.println("\t" + teamName[AWAY] + " VS " + teamName[HOME]);
 
             System.out.println(" Would You Like To Change The Teams (y/n)");
-            String choice = input.next();
+//            String choice = input.next();
+            String choice = "n";
             if (!choice.toUpperCase().equals("Y"))
                 break;
 
@@ -51,7 +52,8 @@ public class BallGame {
                 System.out.println("2. > Normal");
                 System.out.println("3. > Fast");
                 System.out.println("4. > Crazy Fast");
-                gameSpeed = input.nextInt();
+//                gameSpeed = input.nextInt();
+                gameSpeed = 4;
                 if (gameSpeed >= 1 && gameSpeed <= 4)
                     return;
             } catch (InputMismatchException x) {
