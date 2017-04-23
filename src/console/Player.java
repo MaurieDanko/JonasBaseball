@@ -86,7 +86,7 @@ public class Player {
 
     static List<Player> Players = new ArrayList<>();
 
-    static {
+    static { // read players & stats
         try {
             Scanner input = new Scanner(new File("data/hitter_stats"));
             for (; ; ) {

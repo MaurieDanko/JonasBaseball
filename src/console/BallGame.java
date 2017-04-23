@@ -53,7 +53,7 @@ public class BallGame {
     }
 
     void play() {
-        for (int inning = 1; ; inning++) {
+        for (int inning = 1; ; ++inning) {
             atBat(AWAY, inning);
             atBat(HOME, inning);
 
@@ -66,7 +66,6 @@ public class BallGame {
                 + team[winner].getName() + " WIN " + score[winner] + "-" + score[1-winner]
                 + " >>>>>"
         );
-
     }
 
     void atBat(int teamAtBat, int inning) {
