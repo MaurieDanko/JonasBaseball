@@ -17,6 +17,8 @@ public class FinalVersion {
 		// Game Speed
 		int gameSpeed;
 
+		//jonas was here
+
 		// Team Name Variables
 		String teamName1; // First Team Name
 		String teamName2; // Second Team Name
