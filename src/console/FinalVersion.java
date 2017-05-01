@@ -47,7 +47,7 @@ public class FinalVersion {
 		String choice; // User Choice
 
 		// INTRODUCTORY
-		System.out.println("Assignment 3: Baseball Simulator \n");
+		System.out.println("Assignment 3: BaseballGame Simulator \n");
 		System.out.println("\t********** BY MOUJTABAH KARIM **********");
 		System.out.println("Note: Be sure to replace a space with a underscore when naming your team; Example:");
 		System.out.println("      Blue Jays ----> Blue_Jays");
