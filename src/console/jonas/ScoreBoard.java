@@ -1,4 +1,4 @@
-package console;
+package console.jonas;
 
 /**
  * Created by jonas on 2017-05-18.

@@ -1,7 +1,6 @@
-package console;
+package console.jonas;
 
 import java.util.Random;
-import java.util.Scanner;
 
 /**
  * Created by jonas on 2017-05-18.

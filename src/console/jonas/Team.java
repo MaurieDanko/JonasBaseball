@@ -1,4 +1,4 @@
-package console;
+package console.jonas;
 
 import java.util.List;
 
