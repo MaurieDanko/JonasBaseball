@@ -1,6 +1,5 @@
-package console;
+package console.foo;
 
-import java.util.InputMismatchException;
 import java.util.Random;
 import java.util.Scanner;
 

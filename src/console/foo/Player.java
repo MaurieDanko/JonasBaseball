@@ -1,4 +1,4 @@
-package console;
+package console.foo;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * Created by mdanko on 2017-04-18.
+ * Created by foo on 2017-04-18.
  */
 public class Player {
     int id;
