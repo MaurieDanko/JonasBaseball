@@ -1,4 +1,4 @@
-package console.foo;
+package console.mdanko;
 
 import java.util.Random;
 import java.util.Scanner;
