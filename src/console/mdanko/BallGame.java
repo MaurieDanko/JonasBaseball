@@ -10,7 +10,6 @@ public class BallGame {
 
     static Random random = new Random();
     Scanner input = new Scanner(System.in);
-    int gameSpeed;
     int[] score = new int[2];
     int[] batter = new int[2];
     Team[] team = {

@@ -10,6 +10,7 @@ public class Main {
 
         Game game = new Game(team1, team2);
         game.playgame();
+
     }
 
 }
